@@ -127,20 +127,22 @@ namespace MoogleEngine
         }
 
 
-        public List<HashSet<string>> CogerUna()
+        public HashSet<string> Vocabulario()
         {
-            List<HashSet<string>> unicas = new List<HashSet<string>>();
 
+            HashSet<string> unicas = new HashSet<string>();
+
+            
             foreach (List<string> unic in textos)
             {
 
-                HashSet<string> unica = new HashSet<string>(unic);
-                unicas.Add(unica);
-
-
-
-
+                foreach ( string word in unic)
+                {
+                    unicas.Add(word);
+                }
+                
             }
+
 
             return unicas;
 

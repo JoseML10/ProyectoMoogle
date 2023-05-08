@@ -4,7 +4,8 @@
 public static class Moogle
 {
     static Matriz matriz = new Matriz();
-    
+
+
     public static SearchResult Query(string query) 
     {
        
@@ -12,7 +13,7 @@ public static class Moogle
        
         Query consulta = new Query(query);
        
-
+        
         Puntuacion scores = new Puntuacion( matriz , consulta);
         
         Dictionary<string , double > orden = scores.OrdenarScores();

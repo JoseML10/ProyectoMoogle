@@ -110,7 +110,7 @@ namespace MoogleEngine
 
         }
 
-        public static List<Dictionary<string, double>> CopiarHash(List<HashSet<string>> unicas)
+        public static Dictionary<string, double> CopiarHash(HashSet<string> unicas)
         {
             //este metodo recibe una lista de Hashsets , en particular recibe el vocabulario de cada texto
             //una lista con todas las palabras de un texto , sin repetir ,  por eso el uso del  HashSet 
@@ -118,107 +118,79 @@ namespace MoogleEngine
             //las palabras de cada HashSet , con valor 0 para todas .
             //se va usar en el Metodo NumeroenDocumentos , para tener en un diccionario todas las
             //palabras de cada vocabulario .
-            List<Dictionary<string, double>> copiahash = new List<Dictionary<string, double>>();
+            Dictionary<string, double> copiahash = new Dictionary<string, double>();
 
-            foreach (HashSet<string> unic in unicas)
+            foreach (string unic in unicas)
             {
-                Dictionary<string, double> words = new Dictionary<string, double>();
-
-                foreach (string j in unic)
-                {
-                    words.Add(j, 0);
-
-
-
-                }
-
-                copiahash.Add(words);
+                copiahash.Add(unic , 0);
 
             }
-
+            
 
             return copiahash;
 
         }
-        public static List<Dictionary<string, double>> NumeroenDocumentosTXT(Documentos textos)
+        public static Dictionary<string, double> NumeroenDocumentosTXT(Documentos textos)
         {
 
             //se llama al metodo CogerUna de la clase Documentos,para almacenar en una lista de HashSets
             //el  vocabulario de cada texto , se le va a pasar como parametro  al metodo CopiarHash.
 
-            List<HashSet<string>> words = textos.CogerUna();
-            List<Dictionary<string, double>> frecuencias = CopiarHash(words);
-            string ruta = @"C:\JOSE\moogle-main\Content";
+            HashSet<string> words = textos.Vocabulario();
+            string[] copiawords = words.ToArray();
+            
+           
+            Dictionary<string, double> frecuencias =  CopiarHash(words);
+
+           
             //se utiliza el metodo GetFiles de la clase Directory para almacenar en un array todas...
             //las rutas de los archivos txt de la carpeta Content.
-            string[] documentos = Directory.GetFiles(ruta, "*txt");
             
-            List<Dictionary<string, double>> resultado = new List<Dictionary<string, double>>();
+            List<List<string>> copiatextos = textos.CopiarDocumento();  
 
+        
 
-           foreach (Dictionary<string, double> unicas in frecuencias)
+            foreach ( List<string> texto in copiatextos)
             {
-                
-                //se crea una copia de cada diccionario de la lista frecuencias para evitar que me de 
-                //error al tratar de modificar el diccionario mientras lo recorro 
-
-                Dictionary<string, double> copia = new Dictionary<string, double>(unicas);
-
-
-
-                foreach (KeyValuePair<string, double> elementos in unicas)
+                for( int i = 0; i<copiawords.Length; i++ )
                 {
-
-                    for (int i = 0; i < documentos.Length; i++)
+                    if (texto.Contains(copiawords[i]))
                     {
-                        //se utiliza el metodo ReadAlltext de la clase File para almacenar  en 
-                        //la cadena texto , cada texto de la carpeta Content 
-                        //se aplica el metodo ToLower para llevarlo a minuscular y evitar confusiones
-                        //a la hora de comparar dos cadenas que en esencia son la misma pero una ...
-                        //en mayusculas y la otra en minusculas
-
-                        string texto = File.ReadAllText(documentos[i]).ToLower();
-                        
-
-                        if (texto.Contains(elementos.Key))
-                        {
-                            //aplicando el metodo Contains a la cadena texto se verifica si la palabra esta en el texto
-                            //si esta , se aumenta el valor a la clave en el diccionario copia , la clave es la palabra que se verifica.
-                            copia[elementos.Key]++;
-
-
-                        }
-                        else
-                        {
-                            continue;
-                        }
-
-
-
+                        frecuencias[copiawords[i]]++;
+                        continue;
 
                     }
-
-
-
+                    else
+                    {
+                        continue;
+                    }
                 }
 
-                resultado.Add(copia);
-                //se añade el diccionario a la lista resultado que sera devuelta , esta tendra un diccionario para cada texto...
-                //y cada diccionario tendra la palabra en el texto y en cuantos textos se repite.
+               
 
             }
 
-            return resultado;
+
+        
+           
+            
 
 
+            
+
+           
+            
+
+            return frecuencias;
         }
 
+                
         public static List<Dictionary<string, double>> CalcularTDIDFDoc(Documentos textos)
         {
             
 
             List<Dictionary<string, double>> tds = TFDoc(textos);
-            List<Dictionary<string, double>> idfs = IDFdoc(textos);
+            Dictionary<string, double> idfs = IDFdoc(textos);
             List<Dictionary<string, double>> tdidfs = new List<Dictionary<string, double>>();
 
 
@@ -232,7 +204,7 @@ namespace MoogleEngine
                 {
                      //se multiplica los valores de ambos diccionarios , uno con el tf y el otro con el idf
                      //se obtiene el TF-IDF
-                    double calculo = (double)tds[i][valores.Key] * idfs[i][valores.Key];
+                    double calculo = (double)tds[i][valores.Key] * idfs[valores.Key];
 
 
                     valor.Add(valores.Key, calculo);
@@ -257,63 +229,49 @@ namespace MoogleEngine
 
 
 
+
        
-        public static List<Dictionary<string, double>> IDFdoc(Documentos textos)
+        public static Dictionary<string, double> IDFdoc(Documentos textos)
         {
 
+           
             string ruta = @"C:\JOSE\moogle-main\Content";
             string[] documentos = Directory.GetFiles(ruta, "*txt");
-            List<Dictionary<string, double>> repeticiones = NumeroenDocumentosTXT(textos);
-            List<Dictionary<string, double>> idfs = new List<Dictionary<string, double>>();
+            Dictionary<string, double> repeticiones = NumeroenDocumentosTXT(textos);
+            Dictionary<string, double> idfs = new Dictionary<string, double>();
             //en esta variable se almacena el valor del logaritmo natural de la cantidad de documetos de la coleccion.
             //la cantidad de documentos de la coleccion se obtiene del array documentos con todas las rutas de los documentos de la carpeta Content
             //como es un valor que se usa en todos los calculos del IDF lo almaceno aca para evitar calcularlo dentro del bucle
             
             double logT = Math.Log(documentos.Length);
 
-            foreach (Dictionary<string, double> dic in repeticiones)
-            {
+           
+            
                 //se recorre la lista repeticiones , esta es la lista que contiene el resultado del metodo NumeroenDocumentos
                 //esta lista tiene en cada diccionario en cuantos textos de la coleccion aparecen las palabras de cada texto .
 
-                Dictionary<string, double> prueba = new Dictionary<string, double>();
+                
 
-                foreach (KeyValuePair<string, double> elemento in dic)
+                foreach (KeyValuePair<string, double> elemento in repeticiones)
                 {
 
                     //aunque la formula del idf es logaritmo natural de la division entre el numero total de documentos de la coleccion 
                     //entre la cantidad de textos en los que aparece palabra , voy a utilizar la propiedad de los logaritmos para
                     //calcular el logaritmo de una division como el la resta de logaritmos de igual base 
                     //ya que el numero total de documentos es constante lo guardo afuera del  bucle y solo calculo el logaritmo de la cantidad de textos en los que aparece la palabra;
-                   
-                   
+
+
                      double idf =(double) logT -  Math.Log(elemento.Value);
 
-                     prueba.Add(elemento.Key, idf);
-
-                    
-
-
-
-
-
-
+                     idfs.Add(elemento.Key, idf);
                 }
 
-                idfs.Add(prueba);
 
+
+
+                 return idfs;   
+     
             }
-
-
-
-
-            return idfs;
-
-
-
-
-
-        }
 
 
     }

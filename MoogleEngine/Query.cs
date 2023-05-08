@@ -10,6 +10,9 @@ namespace MoogleEngine
 {
     public class Query
     {
+
+        
+        
         public Dictionary<string, double> query;
 
 
