@@ -14,8 +14,8 @@ namespace MoogleEngine
         public Documentos()
         {
 
-            this.textos = new List<List<string>>();
-            this.textos.AddRange(RecorrerDocumento());
+            this.textos = RecorrerDocumento();
+            
 
 
         }

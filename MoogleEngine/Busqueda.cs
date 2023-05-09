@@ -100,7 +100,7 @@ namespace MoogleEngine
         public Dictionary<string, double> OrdenarScores()
         {
             List<double> scores = new List<double>();
-            Dictionary<string, double> tresmejores = new Dictionary<string, double>();
+            Dictionary<string, double> orden = new Dictionary<string, double>();
 
 
             foreach (KeyValuePair<string, double> par in this.puntaje)
@@ -122,13 +122,19 @@ namespace MoogleEngine
                 {
                     if (scores[i] == par.Value)
                     {
-                        if (tresmejores.ContainsKey(par.Key))
+                        if (orden.ContainsKey(par.Key))
                         {
                             continue;
                         }
-                        tresmejores.Add(par.Key, scores[i]);
+                        
+                    
+
+                        orden.Add(par.Key, scores[i]);
 
                         break;
+                    
+
+                       
 
 
 
@@ -142,7 +148,7 @@ namespace MoogleEngine
 
             }
 
-            return tresmejores;
+            return orden;
 
 
 
